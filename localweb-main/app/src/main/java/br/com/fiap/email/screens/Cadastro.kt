@@ -1,9 +1,12 @@
 package br.com.fiap.email.screens
 
 import UserAccountRegisterDto
+import UserPreferences
+import UserViewModel
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +19,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,7 +47,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import br.com.fiap.email.R
-import br.com.fiap.email.viewmodel.UserViewModel
+
+
 
 @Composable
 fun Cadastro(navController: NavController) {
@@ -49,7 +57,9 @@ fun Cadastro(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var confirmpassword by remember { mutableStateOf("") }
     var erroEmail by remember { mutableStateOf(false) }
-    val sizeMax = 15
+    var selectedTheme by remember { mutableStateOf(Theme.LIGHT) }
+    var selectedCategory by remember { mutableStateOf(Category.PESSOAL) }
+    var expandedCategoryMenu by remember { mutableStateOf(false) }
 
     val viewModel: UserViewModel = viewModel()
     val context = LocalContext.current
@@ -163,6 +173,72 @@ fun Cadastro(navController: NavController) {
                 textStyle = TextStyle(fontSize = 16.sp)
             )
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Theme selection
+            Text(
+                text = "Escolha o Tema",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Row {
+                RadioButton(
+                    selected = selectedTheme == Theme.LIGHT,
+                    onClick = { selectedTheme = Theme.LIGHT },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = Color.Blue,
+                        unselectedColor = Color.Gray
+                    )
+                )
+                Text("Claro", modifier = Modifier.padding(start = 8.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                RadioButton(
+                    selected = selectedTheme == Theme.DARK,
+                    onClick = { selectedTheme = Theme.DARK },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = Color.Blue,
+                        unselectedColor = Color.Gray
+                    )
+                )
+                Text("Escuro", modifier = Modifier.padding(start = 8.dp))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Category selection
+            Text(
+                text = "Escolha a Categoria",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Row {
+                Text(
+                    text = selectedCategory.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expandedCategoryMenu = true }
+                        .background(Color.Gray.copy(alpha = 0.1f))
+                        .padding(16.dp),
+                    textAlign = TextAlign.Center
+                )
+                DropdownMenu(
+                    expanded = expandedCategoryMenu,
+                    onDismissRequest = { expandedCategoryMenu = false }
+                ) {
+                    Category.values().forEach { category ->
+                        DropdownMenuItem(
+                            text = { Text(category.name) },
+                            onClick = {
+                                selectedCategory = category
+                                expandedCategoryMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
                     if (password == confirmpassword && !erroEmail) {
@@ -170,7 +246,11 @@ fun Cadastro(navController: NavController) {
                             name = name,
                             email = email,
                             password = password,
-                            preferences = null // ou preencha com as preferências do usuário, se houver
+                            preferences = UserPreferences(
+                                theme = selectedTheme,
+                                color = "", // ou um valor padrão
+                                category = selectedCategory
+                            )
                         )
                         viewModel.registerUser(user) { result ->
                             if (result != null) {
@@ -191,5 +271,3 @@ fun Cadastro(navController: NavController) {
         }
     }
 }
-
-

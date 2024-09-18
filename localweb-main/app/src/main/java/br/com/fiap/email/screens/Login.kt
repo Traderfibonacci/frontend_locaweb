@@ -1,7 +1,9 @@
 package br.com.fiap.email.screens
 
+import UserViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,39 +41,30 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.fiap.email.R
 
+
 @Composable
-fun Login(navController: NavController) {
-    var email by remember() {
-        mutableStateOf("")
-    }
-
-    var password by remember {
-        mutableStateOf("")
-    }
-
-    var erroEmail by remember {
-        mutableStateOf(false)
-    }
-
-    val sizeMax = 15
-
+fun Login(navController: NavController, userViewModel: UserViewModel) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var erroEmail by remember { mutableStateOf(false) }
+    var erroSenha by remember { mutableStateOf(false) }
+    var loginInvalido by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(30.dp, 28.dp)
         ) {
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-//                    .background(colorResource(id = R.color.purple_200))
-            ){
+            ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Image(
@@ -96,7 +89,7 @@ fun Login(navController: NavController) {
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-            ){
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.baseline_login_24),
                     contentDescription = "Teste"
@@ -150,7 +143,7 @@ fun Login(navController: NavController) {
             OutlinedTextField(
                 value = password,
                 onValueChange = {
-                    if (it.length <= sizeMax) {
+                    if (it.length <= 15) { // Ajuste aqui conforme o tamanho máximo permitido
                         password = it
                     }
                 },
@@ -176,15 +169,15 @@ fun Login(navController: NavController) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ){
-                Row (
+            ) {
+                Row(
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     Text(
                         text = "Lembre-me",
                         color = colorResource(id = R.color.black_text),
@@ -204,16 +197,34 @@ fun Login(navController: NavController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(120.dp))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            if (loginInvalido) {
+                Text(
+                    text = "Credenciais inválidas. Tente novamente.",
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
             Button(
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
-                    if(email.isEmpty()){
-                        erroEmail = true
-                    }else{
-                        erroEmail = false
-                        navController.navigate("dashboard")
+                    erroEmail = email.isEmpty()
+                    erroSenha = password.isEmpty()
+
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
+                        // Simulação de autenticação
+                        val autenticado = autenticarUsuario(email, password)
+
+                        if (autenticado) {
+                            userViewModel.currentTheme = Theme.LIGHT // ou Theme.DARK, conforme a preferência
+                            navController.navigate("dashboard")
+                        } else {
+                            loginInvalido = true
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00ACC8))
@@ -229,35 +240,28 @@ fun Login(navController: NavController) {
                 )
             }
 
-            Row (
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ){
+                    .fillMaxWidth()
+                    .padding(30.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Text(
-                    text = "Não tem uma conta? ",
-                    color = colorResource(id = R.color.black_text),
-                    fontSize = 14.sp
-                )
-                Button(
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    onClick = {
+                    text = "Não tem uma conta? Cadastre-se",
+                    style = TextStyle(
+                        color = colorResource(id = R.color.blue_project),
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.clickable {
                         navController.navigate("cadastro")
                     }
-                ) {
-                    Text(
-                        text = "Registre-se",
-                        style = TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            color = colorResource(id = R.color.blue_project)
-                        ),
-                        fontSize = 14.sp
-                    )
-                }
-
+                )
             }
         }
-
     }
+}
+
+private fun autenticarUsuario(email: String, senha: String): Boolean {
+
+    return true
 }

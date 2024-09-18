@@ -5,9 +5,29 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 data class UserPreferences(
-    val preference1: String,
-    val preference2: Boolean
+    val theme: Theme,
+    val color: String,
+    val category: Category
 )
+
+enum class Theme {
+    LIGHT, DARK
+}
+
+enum class Category(val value: String) {
+    PESSOAL("pessoal"),
+    TRABALHO("trabalho"),
+    SOCIAL("social"),
+    PROMOCAO("promocao");
+
+    companion object {
+        fun fromString(value: String): Category {
+            return values().find { it.value.equals(value, ignoreCase = true) }
+                ?: throw IllegalArgumentException("Unknown category: $value")
+        }
+    }
+}
+
 data class UserAccountRegisterDto(
     val id: Long? = null,
     val name: String,
