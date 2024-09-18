@@ -1,5 +1,7 @@
 package br.com.fiap.email.retrofit
 
+import java.time.LocalDateTime
+
 data class Email(
     val recipient: String,
     val sender: String,

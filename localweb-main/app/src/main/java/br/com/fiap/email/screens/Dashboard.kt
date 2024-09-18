@@ -105,7 +105,7 @@ fun Dashboard(navController: NavController) {
                 )
             }
             Button(
-                onClick = { navController.navigate("enviarEmail") },
+                onClick = { navController.navigate("envioEmail") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)

@@ -1,6 +1,7 @@
 package br.com.fiap.email
 
 import Dashboard
+import EnvioEmail
 import LeituraEmail
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -44,6 +45,10 @@ class MainActivity : ComponentActivity() {
                         composable(route = "dashboard") {
                             Dashboard(navController)
                         }
+                        composable(route = "envioEmail") {
+                            EnvioEmail(navController)
+                        }
+
                     }
                 }
             }
