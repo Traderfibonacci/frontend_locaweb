@@ -1,5 +1,7 @@
 package br.com.fiap.email.screens
 
+import UserAccountRegisterDto
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -34,45 +37,37 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import br.com.fiap.email.R
+import br.com.fiap.email.viewmodel.UserViewModel
 
 @Composable
 fun Cadastro(navController: NavController) {
-    var email by remember() {
-        mutableStateOf("")
-    }
-
-    var password by remember {
-        mutableStateOf("")
-    }
-
-    var confirmpassword by remember {
-        mutableStateOf("")
-    }
-
-    var erroEmail by remember {
-        mutableStateOf(false)
-    }
-
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmpassword by remember { mutableStateOf("") }
+    var erroEmail by remember { mutableStateOf(false) }
     val sizeMax = 15
 
+    val viewModel: UserViewModel = viewModel()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(30.dp, 28.dp)
         ) {
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ){
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Image(
@@ -97,7 +92,7 @@ fun Cadastro(navController: NavController) {
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-            ){
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.baseline_login_24),
                     contentDescription = "Teste"
@@ -118,116 +113,83 @@ fun Cadastro(navController: NavController) {
                     fontSize = 14.sp
                 )
             }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(30.dp)
-        ) {
+            Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Nome") },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(text = "joao@gmail.com")
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_email_24),
-                        contentDescription = "Email Icon"
-                    )
-                },
-                label = {
-                    Text(text = "Email")
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                isError = erroEmail,
-                textStyle = TextStyle(color = Color.Black)
+                textStyle = TextStyle(fontSize = 16.sp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
-                value = password,
+                value = email,
                 onValueChange = {
-                    if (it.length <= sizeMax) {
-                        password = it
-                    }
+                    email = it
+                    erroEmail = !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
                 },
+                label = { Text("Email") },
+                isError = erroEmail,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(text = "********")
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_https_24),
-                        contentDescription = "Password Icon"
-                    )
-                },
-                label = {
-                    Text(text = "Senha")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
-                ),
-                visualTransformation = PasswordVisualTransformation(),
-                textStyle = TextStyle(color = Color.Black)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                textStyle = TextStyle(fontSize = 16.sp)
             )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = confirmpassword,
-                onValueChange = {
-                    if (it.length <= sizeMax) {
-                        confirmpassword = it
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(text = "********")
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_https_24),
-                        contentDescription = "Password Icon"
-                    )
-                },
-                label = {
-                    Text(text = "Confirmar Senha")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
-                ),
-                visualTransformation = PasswordVisualTransformation(),
-                textStyle = TextStyle(color = Color.Black)
-            )
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            Button(
-                shape = RoundedCornerShape(10.dp),
-                onClick = {
-                    if(email.isEmpty()){
-                        erroEmail = true
-                    }else{
-                        erroEmail = false
-                        navController.navigate("dashboard")
-                    }},
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00ACC8))
-            ) {
+            if (erroEmail) {
                 Text(
-                    text = "Cadastrar",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    text = "Email inválido",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 16.dp)
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Senha") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                visualTransformation = PasswordVisualTransformation(),
+                textStyle = TextStyle(fontSize = 16.sp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = confirmpassword,
+                onValueChange = { confirmpassword = it },
+                label = { Text("Confirme a Senha") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                visualTransformation = PasswordVisualTransformation(),
+                textStyle = TextStyle(fontSize = 16.sp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    if (password == confirmpassword && !erroEmail) {
+                        val user = UserAccountRegisterDto(
+                            name = name,
+                            email = email,
+                            password = password,
+                            preferences = null // ou preencha com as preferências do usuário, se houver
+                        )
+                        viewModel.registerUser(user) { result ->
+                            if (result != null) {
+                                Toast.makeText(context, "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show()
+                                navController.navigate("login")
+                            } else {
+                                Toast.makeText(context, "Erro ao realizar cadastro.", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Verifique os dados inseridos.", Toast.LENGTH_LONG).show()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Cadastrar")
+            }
         }
-
     }
 }
+
+

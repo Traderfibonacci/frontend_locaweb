@@ -40,7 +40,6 @@ import androidx.navigation.NavController
 import br.com.fiap.email.R
 import br.com.fiap.email.retrofit.Email
 
-
 @Composable
 fun Dashboard(navController: NavController) {
     var search by remember { mutableStateOf("") }
@@ -104,6 +103,7 @@ fun Dashboard(navController: NavController) {
                     contentDescription = "Calendar Icon"
                 )
             }
+
             Button(
                 onClick = { navController.navigate("envioEmail") },
                 modifier = Modifier
@@ -112,6 +112,7 @@ fun Dashboard(navController: NavController) {
             ) {
                 Text(text = "Novo Email")
             }
+
 
             OutlinedTextField(
                 value = search,
@@ -175,5 +176,3 @@ fun Dashboard(navController: NavController) {
         }
     }
 }
-
-

@@ -49,9 +49,10 @@ class MainActivity : ComponentActivity() {
                             EnvioEmail(navController)
                         }
 
+                        }
                     }
                 }
             }
         }
     }
-}
+
